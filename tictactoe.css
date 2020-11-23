@@ -1,0 +1,15 @@
+body {
+    background-color: rgb(160, 160, 100);
+    max-width: 1150px;
+}
+
+table {
+    margin: auto;
+}
+
+td {
+    background-color: rgb(20, 40, 140);
+    border: 2px solid rgb(20, 40, 240);
+    height: 5rem;
+    width: 5rem;
+}
