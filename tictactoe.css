@@ -1,5 +1,7 @@
 body {
     background-color: rgb(160, 160, 100);
+    box-sizing: border-box;
+    margin: 0 auto;
     max-width: 1150px;
 }
 
@@ -18,4 +20,8 @@ td {
     text-align: center;
     height: 5rem;
     width: 5rem;
+}
+
+h1 {
+    text-align: center;
 }
