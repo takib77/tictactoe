@@ -1,15 +1,11 @@
 'use strict'
 
-
-// Kiinduló állapot
 const matrix = [];
 let stepCount = 0;
 let rows = 3;
 let cells = 3;
 let sign = 'X';
 
-
-// Mátrix feltöltése
 const initState = () => {
     for (let i = 0; i < rows; i += 1) {
         matrix[i] = [];
@@ -19,6 +15,19 @@ const initState = () => {
     }
 }
 
+const deleteSigns = () => {
+    document
+        .querySelectorAll('.sector')
+        .forEach(element => {
+            element.textContent = '';
+        });
+}
+
+const changeMatrixValue = (element) => {
+    const row = parseInt(element.dataset.row, 10);
+    const cell = parseInt(element.dataset.cell, 10);
+    matrix[row][cell] = element.textContent;
+}
 
 const increaseCounter = () => {
     stepCount += 1;
@@ -33,73 +42,93 @@ const setMark = () => {
     sign = sign === 'X' ? 'O' : 'X';
 }
 
-
-// A mátrix egy elemének értéket adok, az adott elem data attributumait felhasználva nyerem ki az értéket
-const changeMatrixValue = (element) => {
-    const row = parseInt(element.dataset.row, 10);
-    const cell = parseInt(element.dataset.cell, 10);
-    matrix[row][cell] = element.textContent;
-}
-
-
-// Kattintás során ezek történnek
 const handleClick = (event) => {
     increaseCounter();
     modifyCell(event.target);
     setMark();
     changeMatrixValue(event.target);
-    //    checkWinner();
+    checkWinner();
 }
 
-
-// Minden elemhez hozzáadom az eseményfigyelőt
 const addListener = () => {
-    document.querySelectorAll('td.sector').forEach(element => {
+    document.querySelectorAll('.sector').forEach(element => {
         element.addEventListener('click', handleClick)
     });
 }
 
-
-// Minden elemről törlöm az eseményfigyelőt, ha van győztes
 const removeListener = () => {
-    document.querySelectorAll('td.sector').forEach(element => {
-        element.removeListener('click', handleClick)
+    document.querySelectorAll('.sector').forEach(element => {
+        element.removeEventListener('click', handleClick)
     });
 }
 
-
-// Megnézem hogy van e olyan sor, ahol minden elem ugyanaz
-const checkRowValues = () => {
-    const values = matrix.map(row =>
-        row.every((value) => value === 'X') ||
-        row.every((value) => value === 'O'))
-    return values.indexOf(true) !== -1 ? true : false;
+const checkValues = (arr) => {
+    for (let i = 0; i < arr.length; i += 1) {
+        if (
+            arr[i].every((value) => value === 'X') ||
+            arr[i].every((value) => value === 'O')
+        ) {
+            return true;
+        }
+    }
+    return false
 }
 
-// Megnézem hogy van e olyan oszlop, ahol minden elem ugyanaz
-// TODO: Meg kell írnod, boolean adjon vissza
-const checkColumnValues = () => { }
+const checkColumnValues = () => {
+    const columns = [];
+    for (let i = 0; i < matrix.length; i += 1) {
+        columns[i] = [];
+        for (let j = 0; j < matrix[i].length; j += 1) {
+            columns[i][j] = matrix[j][i];
+        }
+    }
+    return checkValues(columns);
+}
 
-// Megnézem hogy van e olyan oszlop, ahol minden elem ugyanaz
-// TODO: Meg kell írnod, boolean adjon vissza
-const checkDiagonalValues = () => { }
+const checkDiagonalValues = () => {
+    const firstDiagonal = [];
+    const secondDiagonal = [];
+    for (let i = 0; i < matrix.length; i += 1) {
+        firstDiagonal.push(matrix[i][i]);
+        secondDiagonal.push(matrix[i][matrix[i].length - i - 1])
+    }
+    return checkValues([firstDiagonal, secondDiagonal]);
+}
 
 
-// TODO: Meg kell írnod, nincs befejezve
 const checkWinner = () => {
-    // Akár a checkRowValues, checkColumnValues, checkDiagonalValues true, akkor van győztes
-    // Csak azért van itt a log hogy lássátok hogy true akkor lesz ha van olyan sor ahol minden elem ugyanaz
-    console.log(checkRowValues());
+    if (checkValues(matrix) || checkColumnValues() || checkDiagonalValues()) {
+        endGame()
+    }
 }
 
+const setMessage = (message) => {
+    document
+        .querySelector('.message')
+        .textContent = message
+}
 
+const startGame = () => {
+    initState();
+    addListener();
+    newGame();
+}
 
+const endGame = () => {
+    setMessage('A győztes: ' + (sign === 'X' ? 'O' : 'X'));
+    removeListener();
+}
 
+const newGame = () => {
+    document
+        .querySelector('.new-game')
+        .addEventListener('click', () => {
+            initState();
+            addListener();
+            deleteSigns();
+            setMessage('');
+            setMark()
+        })
+}
 
-
-
-
-
-
-initState();
-addListener();
+startGame();
